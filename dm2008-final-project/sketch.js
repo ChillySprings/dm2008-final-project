@@ -3,17 +3,25 @@ const WORLD_HEIGHT = 1000;
 
 let player, darkness, camera;
 
-let fireflyAmount = 100;
+let imgPlayer, imgGround, imgFlowerClose, imgFlowerOpen, imgMoth;
+
+let fireflyAmount = 20; 
 let fireflies = [];
 
-let mothAmount = 100;
+let mothAmount = 5;
 let moths = [];
 let flowers = [];
 
 let lights = [];
 
-function setup() {
-    createCanvas(400, 400);
+async function setup() {
+    createCanvas(500, 500);
+    imgPlayer = await loadImage("assets/asset_player.png");
+    imgFlowerClose = await loadImage("assets/asset_flower_close.png");
+    imgFlowerOpen = await loadImage("assets/asset_flower_open.png");
+    imgMoth = await loadImage("assets/asset_moth.png");
+    imgGround = await loadImage("assets/asset_ground.png");
+
     player = new Player();
     camera = new Camera(createVector(width / 2 - player.position.x, height / 2 - player.position.y));
 
@@ -32,9 +40,9 @@ function setup() {
     }
 
     flowers.push(new Flower(createVector(200, 200)));
-    flowers.push(new Flower(createVector(220, 200)));
-    flowers.push(new Flower(createVector(240, 200)));
+    flowers.push(new Flower(createVector(230, 200)));
     flowers.push(new Flower(createVector(260, 200)));
+    flowers.push(new Flower(createVector(290, 200)));
 
     for (let firefly of fireflies) {
         lights.push(firefly);
@@ -51,6 +59,9 @@ function draw() {
 
     camera.move(player);
     translate(camera.position.x, camera.position.y);
+
+    imageMode(CORNER);
+    image(imgGround, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
     if (player.lanternState != "off") {
         for (let flower of flowers) {

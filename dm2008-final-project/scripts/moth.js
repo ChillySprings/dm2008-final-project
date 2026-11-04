@@ -82,7 +82,10 @@ class Moth {
         this.acceleration.mult(0);
     }
     show() {
-        square(this.position.x, this.position.y, this.size)
+        push();
+        imageMode(CENTER);
+        image(imgMoth, this.position.x, this.position.y, 15, 10);
+        pop();
     }
     randomTarget() {
         let angle = random(TWO_PI);

@@ -5,7 +5,7 @@ class Flower {
         this.colour = 0;
 
         this.lightDiameter = 0;
-        this.lightMaxDiameter = 45;
+        this.lightMaxDiameter = 65;
         this.litSpeed = 0.25;
         this.dimSpeed = 0.25;
 
@@ -20,9 +20,14 @@ class Flower {
     }
     show() {
         push();
-        noStroke();
-        fill(this.colour);
-        circle(this.position.x, this.position.y, this.size);
+        imageMode(CENTER);
+        let img;
+        if (this.state == "normal") {
+            img = imgFlowerClose;
+            } else {
+            img = imgFlowerOpen;
+            }
+        image(img, this.position.x, this.position.y, 30, 25);
         pop();
     }
     interact() {

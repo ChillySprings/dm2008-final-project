@@ -1,13 +1,13 @@
 class Firefly {
     constructor(position) {
         this.position = position;
-        this.size = 10;
+        this.size = 3;
 
         this.lightState = "off";
         this.lightDiameter = 0;
-        this.lightMaxDiameter = 20;
+        this.lightMaxDiameter = 30;
         this.litSpeed = 0.25;
-        this.dimSpeed = 0.25;
+        this.dimSpeed = 0.05;
 
         this.timerState = "start";
         this.startTime;
@@ -15,7 +15,7 @@ class Firefly {
 
         this.acceleration = createVector(0, 0);
         this.velocity = createVector(random(-1, 1), random(-1, 1));
-        this.maxSpeed = 3;
+        this.maxSpeed = 1;
         this.maxForce = 0.05;
     }
     update(fireflies) {
@@ -30,6 +30,12 @@ class Firefly {
     }
     show() {
         push();
+        noStroke();
+        if (this.lightState != "off") {
+            fill(255, 255, 255);
+        } else {
+            fill(0, 0, 0);
+        }
         circle(this.position.x, this.position.y, this.size);
         pop();
     }

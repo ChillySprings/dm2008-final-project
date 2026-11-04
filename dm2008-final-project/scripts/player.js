@@ -5,9 +5,9 @@ class Player {
         this.size = 10;
 
         this.lanternState = "off";
-        this.lightDiameter = 0;
-        this.lightMaxDiameter = 200;
-        this.litSpeed = 0.25;
+        this.lightDiameter = 100;
+        this.lightMaxDiameter = 275;
+        this.litSpeed = 0.10;
         this.dimSpeed = 1;
     }
     update() {
@@ -16,8 +16,8 @@ class Player {
     }
     show() {
         push();
-        rectMode(CENTER);
-        square(this.position.x, this.position.y, this.size);
+        imageMode(CENTER);
+        image(imgPlayer, this.position.x, this.position.y, 55, 67.5);
         pop();
     }
     handleMovement(inputVector) {
@@ -41,8 +41,8 @@ class Player {
         else if (this.lanternState == "dim") {
             this.lightDiameter -= this.dimSpeed;
 
-            if (this.lightDiameter <= 0) {
-                this.lightDiameter = 0;
+            if (this.lightDiameter <= 100) {
+                this.lightDiameter = 100;
                 this.lanternState = "off";
             }
         }
