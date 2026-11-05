@@ -1,16 +1,26 @@
 const WORLD_WIDTH = 1000;
 const WORLD_HEIGHT = 1000;
 
+// Classes
 let player, darkness, camera;
 
+// Images
 let imgPlayer, imgGround, imgFlowerClose, imgFlowerOpen, imgMoth;
 
-let fireflyAmount = 20; 
+// Fireflies
+let fireflyAmount = 20;
 let fireflies = [];
 
+// Moths
 let mothAmount = 5;
 let moths = [];
+
+// Flowers
 let flowers = [];
+
+// Lamps
+let lampAmount = 10;
+let lamps = [];
 
 let lights = [];
 
@@ -34,9 +44,9 @@ async function setup() {
         fireflies.push(firefly);
     }
 
-    for (let i = 0; i < mothAmount; i++) {
-        let moth = new Moth(createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT)));
-        moths.push(moth);
+    for (let i = 0; i < lampAmount; i++) {
+        let lamp = new Lamp(createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT)));
+        lamps.push(lamp);
     }
 
     flowers.push(new Flower(createVector(200, 200)));
@@ -49,6 +59,15 @@ async function setup() {
     }
     for (let flower of flowers) {
         lights.push(flower);
+    }
+
+    for (let lamp of lamps) {
+        lights.push(lamp);
+    }
+
+    for (let i = 0; i < mothAmount; i++) {
+        let moth = new Moth(createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT)));
+        moths.push(moth);
     }
 }
 
@@ -85,7 +104,7 @@ function draw() {
         if (player.lanternState == "off") {
             moth.state = "normal";
         }
-        moth.update();
+        moth.update(lights);
     }
 
     for (let firefly of fireflies) {
@@ -126,9 +145,6 @@ function handleInput() {
 
             for (let firefly of fireflies) {
                 player.checkCollision(firefly, player.lightMaxDiameter);
-            }
-            for (let moth of moths) {
-                moth.interact(player);
             }
         }
     }

@@ -1,14 +1,16 @@
 class Flower {
     constructor(position) {
         this.position = position;
-        this.size = 10;
-        this.colour = 0;
+        this.sizeWidth = 30;
+        this.sizeHeight = 25;
 
+        // Light variables.
         this.lightDiameter = 0;
         this.lightMaxDiameter = 65;
         this.litSpeed = 0.25;
         this.dimSpeed = 0.25;
 
+        // Interaction variables.
         this.state = "normal";
         this.timerDuration = 2000;
         this.startTime;
@@ -21,34 +23,34 @@ class Flower {
     show() {
         push();
         imageMode(CENTER);
+
         let img;
         if (this.state == "normal") {
             img = imgFlowerClose;
-            } else {
+        } else {
             img = imgFlowerOpen;
-            }
-        image(img, this.position.x, this.position.y, 30, 25);
+        }
+
+        image(img, this.position.x, this.position.y, this.sizeWidth, this.sizeHeight);
         pop();
     }
     interact() {
         this.state = "interacted";
-    }
-    flowerInteract() {
-        if (this.state == "normal") {
-            this.state = "interacted";
-        }
     }
     drawLight(mask) {
         this.changeLightSize();
         mask.circle(this.position.x, this.position.y, this.lightDiameter);
     }
     changeLightSize() {
+        // The lightDiameter linearly interpolates to the lightMaxDiameter based on the litSpeed.
         if (this.state != "normal") {
             this.lightDiameter = lerp(this.lightDiameter, this.lightMaxDiameter, this.litSpeed);
         }
         else {
+            // The lightDiameter linearly interpolates to 0 based on the dimSpeed.
             this.lightDiameter = lerp(this.lightDiameter, 0, this.dimSpeed);
 
+            // Round is necessary because lerp tends to never reach a point.
             if (round(this.lightDiameter) == 1) {
                 this.lightDiameter = 0;
             }
@@ -68,7 +70,9 @@ class Flower {
         }
     }
     checkCollision(flower) {
+        // All flowers that have been interacted with by another flower are added into a Hashset (no duplicates).
         if (this.interactedFlowers.has(flower)) {
+            // Returns so flowers that have been interacted with do not interact with each other.
             return;
         }
 

@@ -3,16 +3,22 @@ class Firefly {
         this.position = position;
         this.size = 3;
 
+        // Light variables.
         this.lightState = "off";
         this.lightDiameter = 0;
         this.lightMaxDiameter = 30;
         this.litSpeed = 0.25;
         this.dimSpeed = 0.05;
+        this.litColour = "#ffffffff";
+        this.offColour = "#00000000";
 
+        // Timer variables.
         this.timerState = "start";
         this.startTime;
+        // Change this to change the time intervals between pulsing.
         this.timerDuration = random(5000, 10000);
 
+        // Movement variables.
         this.acceleration = createVector(0, 0);
         this.velocity = createVector(random(-1, 1), random(-1, 1));
         this.maxSpeed = 1;
@@ -21,7 +27,7 @@ class Firefly {
     update(fireflies) {
         this.move(fireflies);
         this.show();
-        this.pulse();
+        this.timer();
         this.borders();
     }
     interact() {
@@ -32,9 +38,9 @@ class Firefly {
         push();
         noStroke();
         if (this.lightState != "off") {
-            fill(255, 255, 255);
+            fill(this.litColour);
         } else {
-            fill(0, 0, 0);
+            fill(this.offColour);
         }
         circle(this.position.x, this.position.y, this.size);
         pop();
@@ -56,27 +62,30 @@ class Firefly {
         let alignment = this.align(fireflies);
         let cohesion = this.cohesion(fireflies);
 
-        // Arbitrarily weight these forces
+        // Change this to change how much the fireflies should be separated; 1 is default.
         let separationMultiplier = 1.5;
         separation.mult(separationMultiplier);
 
+        // Change this to change how much the fireflies should be aligned (going in the same direction); 1 is default.
         let alignmentMultiplier = 1;
         alignment.mult(alignmentMultiplier);
 
+        // Change this to change how the fireflies should stay together; 1 is default.
         let cohesionMultiplier = 1;
         cohesion.mult(cohesionMultiplier);
 
-        // Add the force vectors to acceleration
+        // Add the force vectors to acceleration.
         this.acceleration.add(separation);
         this.acceleration.add(alignment);
         this.acceleration.add(cohesion);
     }
     separate(fireflies) {
+        // Change this to change how close the fireflies should stick together.
         let desiredSeparation = 25.0;
         let steer = createVector(0, 0);
         let count = 0;
 
-        // For every boid in the system, check if it's too close
+        // For every firefly in the system, check if it's too close
         for (let firefly of fireflies) {
             let distanceToNeighbor = p5.Vector.dist(this.position, firefly.position);
 
@@ -111,9 +120,12 @@ class Firefly {
         return steer;
     }
     align(fireflies) {
+        // Change this to change how close the fireflies should stick together.
         let neighborDistance = 50;
         let sum = createVector(0, 0);
         let count = 0;
+
+        // It basically finds the sum of every firefly's velocity within that distance and adds it to a sum vector.
         for (let i = 0; i < fireflies.length; i++) {
             let distance = p5.Vector.dist(this.position, fireflies[i].position);
             if (distance > 0 && distance < neighborDistance) {
@@ -121,6 +133,8 @@ class Firefly {
                 count++;
             }
         }
+
+        // Which is then found the average of so that this firefly moves in the average direction of all nearby fireflies.
         if (count > 0) {
             sum.div(count);
             sum.normalize();
@@ -133,19 +147,24 @@ class Firefly {
         }
     }
     cohesion(fireflies) {
+        // Change this to change how close the fireflies should stick together.
         let neighborDistance = 50;
-        let sum = createVector(0, 0); // Start with empty vector to accumulate all locations
+        let sum = createVector(0, 0);
         let count = 0;
+
+        // It finds the sum of every firefly's position within that distance and adds it to a sum vector.
         for (let i = 0; i < fireflies.length; i++) {
             let distance = p5.Vector.dist(this.position, fireflies[i].position);
             if (distance > 0 && distance < neighborDistance) {
-                sum.add(fireflies[i].position); // Add location
+                sum.add(fireflies[i].position);
                 count++;
             }
         }
+
+        // Which is then found the average of so that this firefly tries to stay as a cohesive unit.
         if (count > 0) {
             sum.div(count);
-            return this.seek(sum); // Steer towards the location
+            return this.seek(sum);
         } else {
             return createVector(0, 0);
         }
@@ -170,15 +189,17 @@ class Firefly {
         mask.circle(this.position.x, this.position.y, this.lightDiameter);
     }
     changeLightSize() {
+        // The lightDiameter linearly interpolates to the lightMaxDiameter based on the litSpeed.
         if (this.lightState == "lit") {
             this.lightDiameter = lerp(this.lightDiameter, this.lightMaxDiameter, this.litSpeed);
 
+            // Round is necessary because lerp tends to never reach a point.
             if (round(this.lightDiameter) == this.lightMaxDiameter) {
                 this.lightDiameter = this.lightMaxDiameter;
                 this.lightState = "dim";
             }
         }
-        // Then it reduces in size until it is no more.
+        // The lightDiameter linearly interpolates to 0 based on the dimSpeed.
         else if (this.lightState == "dim") {
             this.lightDiameter = lerp(this.lightDiameter, 0, this.dimSpeed);
 
@@ -188,7 +209,7 @@ class Firefly {
             }
         }
     }
-    pulse() {
+    timer() {
         if (this.timerState == "start") {
             this.startTime = millis();
             this.timerState = "waiting";
@@ -203,6 +224,7 @@ class Firefly {
         }
     }
     borders() {
+        // Just wraps the fireflies around the world borders.
         if (this.position.x < -this.size) {
             this.position.x = WORLD_WIDTH + this.size;
         }

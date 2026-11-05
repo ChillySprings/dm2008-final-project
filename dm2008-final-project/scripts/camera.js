@@ -3,9 +3,10 @@ class Camera {
         this.position = position;
     }
     update(player) {
-        this.move();
+        this.move(player);
     }
     move(player) {
+        // It follows the player while keeping the player in the center of the canvas.
         this.position.x = width / 2 - player.position.x;
         this.position.y = height / 2 - player.position.y;
 

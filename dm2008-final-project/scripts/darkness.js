@@ -1,6 +1,8 @@
 class Darkness {
     constructor() {
         this.layer = createGraphics(WORLD_WIDTH, WORLD_HEIGHT);
+
+        // Change this to change the darkness colour; the last number is the alpha value.
         this.darknessColour = "rgba(0, 0, 0, 0.95)";
     }
     show(lights) {
@@ -8,7 +10,7 @@ class Darkness {
         image(this.layer, 0, 0);
     }
     drawDarkness(lights) {
-        // Reset to complete darkness
+        // Resets to complete darkness.
         push();
         this.layer.clear();
         this.layer.noStroke();
