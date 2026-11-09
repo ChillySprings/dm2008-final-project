@@ -6,7 +6,7 @@ class Flower {
 
         // Light variables.
         this.lightDiameter = 0;
-        this.lightMaxDiameter = 65;
+        this.lightMaxDiameter = 85;
         this.litSpeed = 0.25;
         this.dimSpeed = 0.25;
 
@@ -17,7 +17,6 @@ class Flower {
         this.interactedFlowers = new Set();
     }
     update() {
-        this.show();
         this.timer();
     }
     show() {
@@ -82,5 +81,8 @@ class Flower {
             flower.interact();
             this.interactedFlowers.add(flower);
         }
+    }
+    getYPivot() {
+        return this.position.y + this.sizeHeight / 2;
     }
 }

@@ -10,7 +10,7 @@ class Firefly {
         this.litSpeed = 0.25;
         this.dimSpeed = 0.05;
         this.litColour = "#ffffffff";
-        this.offColour = "#00000000";
+        this.offColour = "#000000";
 
         // Timer variables.
         this.timerState = "start";
@@ -26,7 +26,6 @@ class Firefly {
     }
     update(fireflies) {
         this.move(fireflies);
-        this.show();
         this.timer();
         this.borders();
     }
@@ -240,5 +239,8 @@ class Firefly {
         if (this.position.y > WORLD_HEIGHT + this.size) {
             this.position.y = -this.size;
         }
+    }
+    getYPivot() {
+        return this.position.y + this.size / 2;
     }
 }
