@@ -1,8 +1,8 @@
 class Lamp {
     constructor(position) {
         this.position = position;
-        this.sizeWidth = 10;
-        this.sizeHeight = 10;
+        this.sizeWidth = 25;
+        this.sizeHeight = 75;
 
         // Collision variables
         this.collisionWidth = 10;
@@ -12,7 +12,7 @@ class Lamp {
         this.state = "flicker";
         this.litSpeed = 0.1;
         this.dimSpeed = 1;
-        this.lightMaxDiameter = 200;
+        this.lightMaxDiameter = 400;
         this.lightMinDiameter = 100;
         this.lightDiameter = this.lightMinDiameter;
         this.baseLightDiameter = this.lightDiameter;
@@ -25,14 +25,14 @@ class Lamp {
     }
     show() {
         push();
-        rectMode(CENTER);
-        rect(this.position.x, this.position.y, this.sizeWidth, this.sizeHeight);
+        imageMode(CENTER);
+        image(imgLamp, this.position.x, this.position.y, this.sizeWidth, this.sizeHeight);
 
         //Comment this if you don't want to check collisionSize.
-        noFill();
-        stroke();
-        rectMode(CENTER);
-        rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
+        // noFill();
+        // stroke();
+        // rectMode(CENTER);
+        // rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
 
         pop();
     }
@@ -40,7 +40,10 @@ class Lamp {
         layer.circle(this.position.x, this.position.y, this.lightDiameter);
     }
     interact() {
-        this.state = "lit";
+        if (this.state == "flicker") {
+            this.state = "lit";
+            sndLamp.play();
+        }
     }
     changeLightSize() {
         // The lightDiameter linearly interpolates to the lightMaxDiameter based on the litSpeed.

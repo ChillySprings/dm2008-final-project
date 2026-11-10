@@ -18,6 +18,11 @@ class Player {
         this.dimSpeed = 1;
         this.flickerStrength = 1;
         this.noiseOffset = random(1000);
+
+        // in the constructor
+        this.footstepInterval = 350;
+        this.footstepTimer = 0;
+        this.isWalking = false;
     }
     update() {
         this.flicker();
@@ -29,14 +34,18 @@ class Player {
         image(imgPlayer, this.position.x, this.position.y, this.sizeWidth, this.sizeHeight);
 
         //Comment this if you don't want to check collisionSize.
-        noFill();
-        stroke();
-        rectMode(CENTER);
-        rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
+        // noFill();
+        // stroke();
+        // rectMode(CENTER);
+        // rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
 
         pop();
     }
     handleMovement(inputVector, obstacles) {
+        if (inputVector.mag() === 0) {
+            return false;
+        }
+        
         // The directional inputVector is changed into a magnitude of 1 and then multiplied by the speed.
         inputVector.normalize();
         inputVector.setMag(this.speed);
@@ -45,7 +54,7 @@ class Player {
         let nextPosition = p5.Vector.add(this.position, inputVector);
         for (let obstacle of obstacles) {
             if (this.checkCollision(nextPosition, obstacle)) {
-                return;
+                return false;
             }
         }
         this.position = nextPosition;
@@ -53,6 +62,18 @@ class Player {
         // This constrains the position so it never goes beyond bounds.
         this.position.x = constrain(this.position.x, this.sizeWidth / 2, WORLD_WIDTH - this.sizeWidth / 2);
         this.position.y = constrain(this.position.y, this.sizeHeight / 2, WORLD_HEIGHT - this.sizeHeight / 2);
+
+        return true;
+    }
+    updateFootsteps(moved) {
+        if (moved) {
+            if (millis() - this.footstepTimer >= this.footstepInterval) {
+                sndFootstep.play();
+                this.footstepTimer = millis();
+            }
+        } else {
+            this.footstepTimer = 0;
+        }
     }
     drawLight(layer) {
         layer.circle(this.position.x, this.position.y, this.lightDiameter);

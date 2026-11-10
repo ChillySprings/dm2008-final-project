@@ -5,10 +5,15 @@ const WORLD_HEIGHT = 1000;
 let player, darkness, camera;
 
 // Images
-let imgPlayer, imgGround, imgFlowerClose, imgFlowerOpen, imgMoth;
+let imgPlayer, imgGround, imgFlowerClose, imgFlowerOpen, imgMoth, imgLamp;
+let imgTree1, imgTree2, imgTree3, imgRuin1, imgRuin2, imgRuin3;
+
+// Sounds
+let sndFootstep, sndLamp, sndLantern, sndAmbience;
+let ambienceStarted = false;
 
 // Fireflies
-let fireflyAmount = 50;
+let fireflyAmount = 40;
 let fireflies = [];
 
 // Moths
@@ -16,15 +21,25 @@ let mothAmount = 10;
 let moths = [];
 
 // Flowers
-let flowerGroups = 5;
-let randomFlowerAmount = 100;
+let flowerGroups = 4;
+let randomFlowerAmount = 30;
 let minFlowerDistance = 25;
 let flowers = [];
 
 // Lamps
-let lampAmount = 5;
+let lampAmount = 2;
 let lampMinDistance = 200;
 let lamps = [];
+
+// Trees
+let treeAmount = 15;
+let treeMinDistance = 100;
+let trees = [];
+
+// Ruins
+let ruinAmount = 4;
+let ruinMinDistance = 100;
+let ruins = [];
 
 let lights = [];
 let entities = [];
@@ -37,6 +52,18 @@ async function setup() {
     imgFlowerOpen = await loadImage("assets/asset_flower_open.png");
     imgMoth = await loadImage("assets/asset_moth.png");
     imgGround = await loadImage("assets/asset_ground.png");
+    imgLamp = await loadImage("assets/asset_lamp.png");
+    imgTree1 = await loadImage("assets/asset_tree_1.png");
+    imgTree2 = await loadImage("assets/asset_tree_2.png");
+    imgTree3 = await loadImage("assets/asset_tree_3.png");
+    imgRuin1 = await loadImage("assets/asset_ruin_1.png");
+    imgRuin2 = await loadImage("assets/asset_ruin_2.png");
+    imgRuin3 = await loadImage("assets/asset_ruin_3.png");
+
+    sndFootstep = await loadSound("assets/sound_footstep.wav");
+    sndLamp = await loadSound("assets/sound_lamp.wav");
+    sndLantern = await loadSound("assets/sound_lantern.wav");
+    sndAmbience = await loadSound("assets/sound_ambience.wav");
 
     player = new Player();
     camera = new Camera(createVector(width / 2 - player.position.x, height / 2 - player.position.y));
@@ -110,6 +137,8 @@ function spawnEntities() {
     }
     spawnLamps();
     spawnFlowers();
+    spawnTrees();
+    spawnRuins();
 
     entities.push(player);
     for (let firefly of fireflies) {
@@ -120,6 +149,12 @@ function spawnEntities() {
     }
     for (let flower of flowers) {
         entities.push(flower);
+    }
+    for (let tree of trees) {
+        entities.push(tree);
+    }
+    for (let ruin of ruins) {
+        entities.push(ruin);
     }
 
     lights.push(player);
@@ -143,6 +178,12 @@ function spawnEntities() {
 
     for (let lamp of lamps) {
         obstacles.push(lamp)
+    }
+    for (let tree of trees) {
+        obstacles.push(tree)
+    }
+    for (let ruin of ruins) {
+        obstacles.push(ruin)
     }
 }
 
@@ -220,7 +261,7 @@ function spawnFlowerChain(startingPosition) {
     let direction = p5.Vector.random2D();
     let noiseOffset = random(1000);
 
-    let maxFlowersInChain = 20;
+    let maxFlowersInChain = 3;
     for (let i = 0; i < maxFlowersInChain; i++) {
         spawnFlower(position.copy());
 
@@ -260,6 +301,64 @@ function spawnFlower(position) {
     }
 }
 
+function spawnTrees() {
+    let maxAttempts = 100;
+    let attempts = 0;
+    let position = createVector(0, 0)
+    let treeImages = [imgTree1, imgTree2, imgTree3];
+
+
+    for (let i = 0; i < treeAmount; i++) {
+        while (maxAttempts > attempts) {
+            position = createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT))
+
+            let validPosition = true;
+
+            for (let tree of trees) {
+                let distanceToNeighbour = p5.Vector.dist(position, tree.position)
+
+                if (distanceToNeighbour > 0 && distanceToNeighbour < treeMinDistance) {
+                    validPosition = false;
+                    break;
+                }
+            }
+            if (validPosition) {
+                trees.push(new Tree(position, random(treeImages)));
+                break;
+            }
+        }
+    }
+}
+
+function spawnRuins() {
+    let maxAttempts = 100;
+    let attempts = 0;
+    let position = createVector(0, 0)
+    let ruinImages = [imgRuin1, imgRuin2, imgRuin3];
+
+
+    for (let i = 0; i < ruinAmount; i++) {
+        while (maxAttempts > attempts) {
+            position = createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT))
+
+            let validPosition = true;
+
+            for (let ruin of ruins) {
+                let distanceToNeighbour = p5.Vector.dist(position, ruin.position)
+
+                if (distanceToNeighbour > 0 && distanceToNeighbour < ruinMinDistance) {
+                    validPosition = false;
+                    break;
+                }
+            }
+            if (validPosition) {
+                ruins.push(new Ruin(position, random(ruinImages)));
+                break;
+            }
+        }
+    }
+}
+
 function handleInput() {
     let inputVector = createVector(0, 0);
 
@@ -276,11 +375,20 @@ function handleInput() {
         inputVector.x = 1;
     }
 
-    player.handleMovement(inputVector, obstacles);
+    if (!ambienceStarted && (keyIsDown("w") || keyIsDown("a") || keyIsDown("s") || keyIsDown("d") || keyIsDown(" "))) {
+        sndAmbience.loop();
+        sndAmbience.play();
+        ambienceStarted = true;
+        console.log("ambience started", sndAmbience.isPlaying(), sndAmbience.isLooping());
+    }
+
+    let moved = player.handleMovement(inputVector, obstacles);
+    player.updateFootsteps(moved);
 
     if (keyIsDown(" ")) {
         if (player.lanternState == "flicker") {
             player.lanternState = "lit";
+            sndLantern.play();
 
             for (let firefly of fireflies) {
                 // Change this to change how far away fireflies are affected by the lantern's light.
