@@ -5,6 +5,8 @@ class Lamp {
         this.sizeHeight = 75;
 
         // Collision variables
+        this.collisionX = this.position.x;
+        this.collisionY = this.position.y + this.sizeHeight / 3;
         this.collisionWidth = 10;
         this.collisionHeight = 10;
 
@@ -32,7 +34,7 @@ class Lamp {
         // noFill();
         // stroke();
         // rectMode(CENTER);
-        // rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
+        // rect(this.collisionX, this.collisionY, this.collisionWidth, this.collisionHeight);
 
         pop();
     }
@@ -87,6 +89,13 @@ class Lamp {
         let flicker = map(flickerNoise, 0, 1, minChange, maxChange);
 
         this.lightDiameter = this.lightMinDiameter + flicker * this.flickerStrength;
+    }
+    checkLampCollision(interaction, collisionSize) {
+        let collisionRadius = collisionSize / 2;
+
+        if (dist(this.position.x, this.position.y, interaction.position.x, interaction.position.y) <= collisionRadius) {
+            interaction.interact();
+        }
     }
     getYPivot() {
         return this.position.y + this.sizeHeight / 2;

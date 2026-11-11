@@ -12,6 +12,9 @@ let imgTree1, imgTree2, imgTree3, imgRuin1, imgRuin2, imgRuin3;
 let sndFootstep, sndLamp, sndLantern, sndAmbience;
 let ambienceStarted = false;
 
+// Entities
+let entities = [];
+
 // Fireflies
 let fireflyAmount = 40;
 let fireflies = [];
@@ -26,6 +29,11 @@ let randomFlowerAmount = 30;
 let minFlowerDistance = 25;
 let flowers = [];
 
+// Obstacles
+let obstacles = [];
+let obstacleMinDistance = 150;
+let playerMinDistance = 50;
+
 // Lamps
 let lampAmount = 2;
 let lampMinDistance = 200;
@@ -33,20 +41,15 @@ let lamps = [];
 
 // Trees
 let treeAmount = 15;
-let treeMinDistance = 100;
-let trees = [];
 
 // Ruins
 let ruinAmount = 4;
-let ruinMinDistance = 100;
-let ruins = [];
 
 let lights = [];
-let entities = [];
-let obstacles = [];
 
 async function setup() {
     createCanvas(500, 500);
+
     imgPlayer = await loadImage("assets/asset_player.png");
     imgFlowerClose = await loadImage("assets/asset_flower_close.png");
     imgFlowerOpen = await loadImage("assets/asset_flower_open.png");
@@ -82,9 +85,16 @@ function draw() {
     imageMode(CORNER);
     image(imgGround, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-    if (player.lanternState != "flicker") {
+    if (player.lanternState == "lit") {
         for (let flower of flowers) {
             player.checkLanternCollision(flower, player.lightDiameter);
+        }
+    }
+    for (let flower of flowers) {
+        for (let lamp of lamps) {
+            if (lamp.state == "lit") {
+                lamp.checkLampCollision(flower, lamp.lightDiameter);
+            }
         }
     }
 
@@ -100,10 +110,13 @@ function draw() {
         flowers[i].update();
     }
 
-    for (let lamp of lamps) {
-        if (player.lanternState != "flicker") {
+    if (player.lanternState == "lit") {
+        for (let lamp of lamps) {
             player.checkLanternCollision(lamp, player.lightDiameter);
         }
+    }
+
+    for (let lamp of lamps) {
         lamp.update();
     }
 
@@ -135,8 +148,8 @@ function spawnEntities() {
         let firefly = new Firefly(createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT)));
         fireflies.push(firefly);
     }
-    spawnLamps();
     spawnFlowers();
+    spawnLamps();
     spawnTrees();
     spawnRuins();
 
@@ -144,17 +157,11 @@ function spawnEntities() {
     for (let firefly of fireflies) {
         entities.push(firefly);
     }
-    for (let lamp of lamps) {
-        entities.push(lamp);
-    }
     for (let flower of flowers) {
         entities.push(flower);
     }
-    for (let tree of trees) {
-        entities.push(tree);
-    }
-    for (let ruin of ruins) {
-        entities.push(ruin);
+    for (let obstacle of obstacles) {
+        entities.push(obstacle);
     }
 
     lights.push(player);
@@ -174,44 +181,6 @@ function spawnEntities() {
     }
     for (let moth of moths) {
         entities.push(moth);
-    }
-
-    for (let lamp of lamps) {
-        obstacles.push(lamp)
-    }
-    for (let tree of trees) {
-        obstacles.push(tree)
-    }
-    for (let ruin of ruins) {
-        obstacles.push(ruin)
-    }
-}
-
-function spawnLamps() {
-    // Change this to change how many times the code can try spawning lamps before it gives up.
-    let maxAttempts = 100;
-    let attempts = 0;
-    let position = createVector(0, 0)
-
-    for (let i = 0; i < lampAmount; i++) {
-        while (maxAttempts > attempts) {
-            position = createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT))
-
-            let validPosition = true;
-
-            for (let lamp of lamps) {
-                let distanceToNeighbour = p5.Vector.dist(position, lamp.position)
-
-                if (distanceToNeighbour > 0 && distanceToNeighbour < lampMinDistance) {
-                    validPosition = false;
-                    break;
-                }
-            }
-            if (validPosition) {
-                lamps.push(new Lamp(position));
-                break;
-            }
-        }
     }
 }
 
@@ -301,12 +270,46 @@ function spawnFlower(position) {
     }
 }
 
+function spawnLamps() {
+    // Change this to change how many times the code can try spawning lamps before it gives up.
+    let maxAttempts = 100;
+    let attempts = 0;
+    let position = createVector(0, 0)
+
+    for (let i = 0; i < lampAmount; i++) {
+        while (maxAttempts > attempts) {
+            position = createVector(random(0, WORLD_WIDTH), random(0, WORLD_HEIGHT))
+
+            let validPosition = true;
+
+            for (let obstacle of obstacles) {
+                let distanceToNeighbour = p5.Vector.dist(position, obstacle.position)
+
+                if (distanceToNeighbour > 0 && distanceToNeighbour < obstacleMinDistance) {
+                    validPosition = false;
+                    break;
+                }
+            }
+            let distanceToPlayer = p5.Vector.dist(position, player.position);
+            if (distanceToPlayer < playerMinDistance) {
+                validPosition = false;
+                break;
+            }
+            if (validPosition) {
+                let lamp = new Lamp(position);
+                lamps.push(lamp);
+                obstacles.push(lamp);
+                break;
+            }
+        }
+    }
+}
+
 function spawnTrees() {
     let maxAttempts = 100;
     let attempts = 0;
     let position = createVector(0, 0)
     let treeImages = [imgTree1, imgTree2, imgTree3];
-
 
     for (let i = 0; i < treeAmount; i++) {
         while (maxAttempts > attempts) {
@@ -314,16 +317,21 @@ function spawnTrees() {
 
             let validPosition = true;
 
-            for (let tree of trees) {
-                let distanceToNeighbour = p5.Vector.dist(position, tree.position)
+            for (let obstacle of obstacles) {
+                let distanceToNeighbour = p5.Vector.dist(position, obstacle.position)
 
-                if (distanceToNeighbour > 0 && distanceToNeighbour < treeMinDistance) {
+                if (distanceToNeighbour > 0 && distanceToNeighbour < obstacleMinDistance) {
                     validPosition = false;
                     break;
                 }
             }
+            let distanceToPlayer = p5.Vector.dist(position, player.position);
+            if (distanceToPlayer < playerMinDistance) {
+                validPosition = false;
+                break;
+            }
             if (validPosition) {
-                trees.push(new Tree(position, random(treeImages)));
+                obstacles.push(new Tree(position, random(treeImages)));
                 break;
             }
         }
@@ -343,16 +351,21 @@ function spawnRuins() {
 
             let validPosition = true;
 
-            for (let ruin of ruins) {
-                let distanceToNeighbour = p5.Vector.dist(position, ruin.position)
+            for (let obstacle of obstacles) {
+                let distanceToNeighbour = p5.Vector.dist(position, obstacle.position)
 
-                if (distanceToNeighbour > 0 && distanceToNeighbour < ruinMinDistance) {
+                if (distanceToNeighbour > 0 && distanceToNeighbour < obstacleMinDistance) {
                     validPosition = false;
                     break;
                 }
             }
+            let distanceToPlayer = p5.Vector.dist(position, player.position);
+            if (distanceToPlayer < playerMinDistance) {
+                validPosition = false;
+                break;
+            }
             if (validPosition) {
-                ruins.push(new Ruin(position, random(ruinImages)));
+                obstacles.push(new Ruin(position, random(ruinImages)));
                 break;
             }
         }
@@ -397,4 +410,4 @@ function handleInput() {
             }
         }
     }
-} 
+}

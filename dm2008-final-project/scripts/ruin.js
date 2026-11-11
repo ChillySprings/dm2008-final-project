@@ -6,6 +6,8 @@ class Ruin {
         this.sizeHeight = img.height / 2;
 
         // Collision variables
+        this.collisionX = this.position.x;
+        this.collisionY = this.position.y + this.sizeHeight / 3
         this.collisionWidth = this.sizeWidth;
         this.collisionHeight = 15;
     }
@@ -18,7 +20,7 @@ class Ruin {
         // noFill();
         // stroke();
         // rectMode(CENTER);
-        // rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
+        // rect(this.collisionX, this.collisionY, this.collisionWidth, this.collisionHeight);
 
         pop();
     }

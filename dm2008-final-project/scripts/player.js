@@ -6,8 +6,10 @@ class Player {
         this.sizeHeight = 67.5;
 
         // Collision variables.
-        this.collisionWidth = 55;
-        this.collisionHeight = 20;
+        this.collisionX = this.position.x;
+        this.collisionY = this.position.y + this.sizeHeight / 3;
+        this.collisionWidth = 30;
+        this.collisionHeight = 15;
 
         // Light variables.
         this.lanternState = "flicker";
@@ -37,7 +39,7 @@ class Player {
         // noFill();
         // stroke();
         // rectMode(CENTER);
-        // rect(this.position.x, this.position.y + this.sizeHeight / 2, this.collisionWidth, this.collisionHeight);
+        // rect(this.collisionX, this.CollisionY, this.collisionWidth, this.collisionHeight);
 
         pop();
     }
@@ -45,7 +47,7 @@ class Player {
         if (inputVector.mag() === 0) {
             return false;
         }
-        
+
         // The directional inputVector is changed into a magnitude of 1 and then multiplied by the speed.
         inputVector.normalize();
         inputVector.setMag(this.speed);
@@ -68,6 +70,13 @@ class Player {
     updateFootsteps(moved) {
         if (moved) {
             if (millis() - this.footstepTimer >= this.footstepInterval) {
+                // Change these to change by how much can the pitch of the footsteps change by.
+                let pitchMin = -2;
+                let pitchMax = 2;
+                let pitchShifter = new p5.PitchShifter(random(pitchMin, pitchMax));
+
+                sndFootstep.disconnect();
+                sndFootstep.connect(pitchShifter);
                 sndFootstep.play();
                 this.footstepTimer = millis();
             }
@@ -129,11 +138,10 @@ class Player {
         }
     }
     checkCollision(position, other) {
-        let thisCollisionY = position.y + this.sizeHeight / 2;
-        let otherCollisionY = other.position.y + other.sizeHeight / 2;
+        let thisCollisionY = position.y + this.sizeHeight / 3;
 
-        let collidingX = abs(position.x - other.position.x) <= (this.collisionWidth + other.collisionWidth) / 2;
-        let collidingY = abs(thisCollisionY - otherCollisionY) <= (this.collisionHeight + other.collisionHeight) / 2;
+        let collidingX = abs(position.x - other.collisionX) <= (this.collisionWidth + other.collisionWidth) / 2;
+        let collidingY = abs(thisCollisionY - other.collisionY) <= (this.collisionHeight + other.collisionHeight) / 2;
 
         return collidingX && collidingY;
     }
