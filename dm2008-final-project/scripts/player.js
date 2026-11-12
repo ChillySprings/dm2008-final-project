@@ -13,7 +13,7 @@ class Player {
 
         // Light variables.
         this.lanternState = "flicker";
-        this.lightMinDiameter = 75;
+        this.lightMinDiameter = 90;
         this.lightMaxDiameter = 275;
         this.lightDiameter = this.lightMinDiameter;
         this.litSpeed = 0.1;

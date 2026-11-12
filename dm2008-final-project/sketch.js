@@ -36,7 +36,7 @@ let playerMinDistance = 50;
 
 // Lamps
 let lampAmount = 2;
-let lampMinDistance = 200;
+let lampMinDistance = 400;
 let lamps = [];
 
 // Trees
