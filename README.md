@@ -8,6 +8,9 @@ A small visual sandbox where the player can light up their lantern, expanding th
 
 It is a very minimal experience that simulates the feeling of walking in the dark at night, bumping into trees and rocks while the player uses their lantern to navigate the dark. However, we didn't want it to be a scary experience, it should be a calming walk with no threats or sense of danger. The fireflies lighting up randomly and flowers opening small pockets of light help make the overall feeling more beautiful than dangerous. Considering the small area and simplistic design, we think anyone can pick up and play this for a minute or so without issue.
 
+[W, A, S, D] - To Move Around
+[ SPACE ] - To Light Up Your Lantern
+
 ---
 
 ### Output
@@ -29,8 +32,17 @@ Completed version with sound, trees and rocks.
 ### ✍️ Reflection
 
 ### Caden
+I enjoyed working with Yan Hwei, collaborating and discussing what should be changed to achieve a desired outcome, and reworking and tweaking the code so it matched our wants. In my first week, I sought out to create a largely playable experience that could later be refined and polished in the next week. Most of the behaviour had been written in the first week, and from then on, I mainly added new behaviours and comments to help Yan Hwei finetune the variables.
 
-<--->
+I understood that aesthetic decisions existed beyond just the canvas; how fast the player moves, how "bright" the lights are, how the moths move, etc, can change how a game looks and feels. Hence, it was extremely important that he could understand the code that I wrote, resulting in me adding many comments to explain how everything worked and which variables could be changed to achieve a different result.
+
+Biggest challenges was understanding some of the code I found online, specfically "butterfly" by candy - https://editor.p5js.org/candy/sketches/Y5BiZZm67 and "Flocking" by Darren Kessner https://p5js.org/examples/Classes-And-Objects-Flocking/ 
+
+Their code felt like simulating realistic behaviour that's controlled by multiple different factors, like wanting to wander, move sideways, and vibrate, for "butterfly". It was so different from what we learnt in class that I was completely dumbfounded. It's not that the code was impossible to understand and read, but it was difficult to understand how someone could have planned and make this, and how everything worked.
+
+Because our game worked differently from these scripts, I did have to change and remove some aspects. For "butterfly", the targetting behaviour was overhauled to have the moths calculate the nearest and brightest light every so often and move towards it. The fireflies also needed to have additional interactions.
+
+This was a nice break from my other assignments. If I had more time, I'd unfortunately only have ideas for Yan Hwei to do. It'd be about adding more aesthetic elements to better describe and build the world.
 
 ### Yan Hwei
 
