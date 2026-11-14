@@ -68,6 +68,23 @@ async function setup() {
     sndLantern = await loadSound("assets/sound_lantern.wav");
     sndAmbience = await loadSound("assets/sound_ambience.wav");
 
+    // Change the gains to change the volume mixing.
+    let sndFootstepGain = new p5.Gain(1);
+    sndFootstep.disconnect();
+    sndFootstepGain.connect(sndFootstepGain);
+
+    let sndLampGain = new p5.Gain(0.3);
+    sndLampGain.disconnect();
+    sndLamp.connect(sndLampGain);
+
+    let sndLanternGain = new p5.Gain(0.3);
+    sndLantern.disconnect();
+    sndLantern.connect(sndLanternGain);
+
+    let sndAmbienceGain = new p5.Gain(0.25);
+    sndAmbience.disconnect();
+    sndAmbience.connect(sndAmbienceGain);
+
     player = new Player();
     camera = new Camera(createVector(width / 2 - player.position.x, height / 2 - player.position.y));
     darkness = new Darkness();
@@ -388,13 +405,6 @@ function handleInput() {
         inputVector.x = 1;
     }
 
-    if (!ambienceStarted && (keyIsDown("w") || keyIsDown("a") || keyIsDown("s") || keyIsDown("d") || keyIsDown(" "))) {
-        sndAmbience.loop();
-        sndAmbience.play();
-        ambienceStarted = true;
-        console.log("ambience started", sndAmbience.isPlaying(), sndAmbience.isLooping());
-    }
-
     let moved = player.handleMovement(inputVector, obstacles);
     player.updateFootsteps(moved);
 
@@ -409,5 +419,14 @@ function handleInput() {
                 player.checkLanternCollision(firefly, fireflyCollisionSize);
             }
         }
+    }
+}
+
+function keyPressed() {
+    userStartAudio();
+
+    if (!sndAmbience.isPlaying()) {
+        sndAmbience.loop(true);
+        sndAmbience.play();
     }
 }

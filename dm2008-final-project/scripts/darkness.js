@@ -3,7 +3,7 @@ class Darkness {
         this.layer = createGraphics(WORLD_WIDTH, WORLD_HEIGHT);
 
         // Change this to change the darkness colour; the last number is the alpha value.
-        this.darknessColour = "rgba(0, 0, 0, 0.95)";
+        this.darknessColour = "rgba(0, 0, 0, 0.90)";
     }
     show(lights) {
         this.drawDarkness(lights);
